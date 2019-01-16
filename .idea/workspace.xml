@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e62b7b5e-3ce3-490f-a7ab-ccd299544d5d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/debatr" beforeDir="false" afterPath="$PROJECT_DIR$/debatr" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debatr/.gitattributes" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/debatr/routing.py" beforeDir="false" afterPath="$PROJECT_DIR$/debatr/routing.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -229,9 +230,9 @@
     <frame x="54" y="-8" width="1874" height="1096" extended-state="6" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.28665933" />
+      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.28665933" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="0" visible="true" weight="0.38421598" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="0" visible="true" weight="0.38421598" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="2" weight="0.32917964" />
       <window_info anchor="bottom" id="Message" order="3" />
