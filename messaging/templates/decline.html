@@ -1,0 +1,18 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} Debate Scrapped {% endblock %}
+{% block content %}
+<br/>
+{% if user == one %}
+<h1> Debate with {{ two.username }} Retracted</h1>
+{% else %}
+<h1> Debate with {{ one.username }} Declined</h1>
+{% endif %}
+<div class="bottom-border">
+</div>
+<br/>
+<strong>Looking for another debate? At the navigation bar go to Debate -> Debate Match or search for users or issues in the search bar to get started!</strong>
+<br/>
+<br/>
+<a href="{% url 'home' %}" class="btn btn-primary" style="color: white; margin-left: 45%;">Go to Home Page</a>
+{% endblock %}

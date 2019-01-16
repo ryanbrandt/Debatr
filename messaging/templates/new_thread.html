@@ -1,0 +1,29 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} New Chat with {{ partner }}  {% endblock %}
+{% block content %}
+<br/>
+<h1> New Debate with {{ partner }}</h1>
+<div class="bottom-border">
+</div>
+<br/>
+<h3>How to Get Started</h3>
+<br/>
+<strong> 1) Submit your desired topic for debate below </strong> so we can alert {{ partner }} and allow others to spectate, if they are interested in the topic
+<br/>
+<br/>
+<strong> 2) </strong> The waiting game! {{ partner }} will be notified of your debate request, which will now be visible in your inbox as a pending chat. If they accept, you will be able to begin your discourse. If they decline, {{ partner }} will have the option to specify why they declined. You have the option to retract your debate request anytime before it is accepted.
+<br/>
+<br/>
+<strong> 3) </strong> The debate begins! You and {{ partner }} may begin discourse; you will notice a 'Close Debate' button in the top right of the debate screen, this essentially concludes the debate and allows you and {{ partner }} to view spectator comments, if any.
+<br/>
+<br/>
+<small>All debates on Debatr are public. This means, when other users search for your username or the topic of your debate, your debate will appear and users can spectate live. While we do have a commenting feature for spectators to enjoy, don't worry! Spectator comments are not visible for the debating parties until the debate has been closed, and, thus, should have no influence on discourse.</small>
+<br/>
+<form method="post" style="margin-top: 20px;" id='form'>
+    {% csrf_token %}
+    {{ form | crispy }}
+    <input type="submit" value="Submit Debate Request" class="btn btn-primary"/>
+</form>
+{% endblock %}

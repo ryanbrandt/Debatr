@@ -1,0 +1,16 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Update Profile {% endblock %}
+{% block content %}
+<br/>
+<img src = "{{ user.profile.image.url }}" class = "rounded-circle" style="margin-left: auto; margin-right: auto; display: block; width: 15%; margin-bottom: 30px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 275px; height: 280px;">
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ profile_form | crispy }}
+    {{ user_form | crispy }}
+<button class = "btn btn-primary" type = "submit">Update</button>
+</form>
+<br/>
+
+{% endblock %}

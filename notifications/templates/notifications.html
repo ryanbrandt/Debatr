@@ -1,0 +1,74 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} {{ user.username }}'s Notifications  {% endblock %}
+{% block content %}
+<br/>
+<h1>Notifications</h1>
+<div class="bottom-border">
+</div>
+<div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container">
+    {% for notification, time, other, read in notifications %}
+        {% if not read %}
+            <div class="alert alert-info" role="alert" id="{{ forloop.counter }}{{ notification }}">
+                <strong>{{ notification }} </strong>
+                <small>{{ time }}</small>
+                <form method="post" id="{{ notification }}" class="acknowledge-form">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{ notification }}" id="{{ forloop.counter }}"></input>
+                    <button  style="right:90px; bottom: 12px; position: absolute; border:none; background: none !important; color: inherit; padding: 0 !important; font: inherit; cursor: pointer; color: #007bff;" type="submit">Acknowledge</button>
+                </form>
+                {% if notification != other %}
+                    <a href = "{% url 'thread' username=other %}" style="right: 8px; bottom: 12px; position: absolute; text-decoration: none;">View Now</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+
+// ajax script to update notifications list when users acknowledge
+
+    $(document).on('submit', '.acknowledge-form', function(event){
+    // takes class acknowledge-form, need to get instance to get id which contains notification
+        event.preventDefault();
+        var form = $(this);
+        var notif = form.attr("id");
+        console.log("notification acknowledged");
+        // pass to create_acknowledge to remove notification div from DOM and set instance read
+        create_acknowledge(notif)
+    });
+    // takes instance attribute id, set to notif in previous step
+    function create_acknowledge(notif){
+        console.log("notification being set read")
+        $.ajax({
+            url: "{% url 'notifications' username=user.username %}",
+            type: "POST",
+            data: {'notification': notif, 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
+
+            //on success, pass instance field to views to set true, remove notification from DOM immediately
+            success: function() {
+                // not most efficient way to go, but iterate through container elements until we find the right div
+                //  note how the divs are uniquely id'd in the html
+               var elms = {};
+               var elms = document.getElementById("container").getElementsByTagName("*");
+               var notifBubble = undefined;
+               for(var i = 0; i < elms.length; i++){
+                    notifBubble = document.getElementById(i + notif);
+                    // when found, remove and break
+                    if(notifBubble){
+                        $(notifBubble).remove();
+                         break;
+                    }
+                }
+                console.log("success");
+            },
+            error: function(xhr,err){
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+
+        });
+    };
+</script>
+{% endblock %}

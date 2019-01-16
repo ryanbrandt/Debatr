@@ -1,0 +1,47 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} {{ user_visiting.username }}'s Profile {% endblock %}
+{% block content %}
+<br/>
+<img src = "{{ user_visiting.profile.image.url }}" class = "rounded-circle" style="margin-left: auto; margin-right: auto; display: block; width: 15%; margin-bottom: 30px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 275px; height: 280px;">
+<br/>
+<br/>
+<h3 style="display: inline-block; margin-right: 10px;">About Me</h3>  {% for tag in user_visiting.profile.tags.all|slice:"8" %}<span class="badge badge-light" style="margin-right:5px; align: center; padding: 4px;" ><a href="http://wikipedia.com/wiki/{{ tag.tag }}" target="_blank" style="text-decoration: none; color: black;">{{ tag.tag }}</a> </span>{% endfor %}
+{% if user_visiting not in user.profile.following.all %}
+    <button class="btn btn-primary" style="float: right;" id="follow">Follow Me</button>
+{% else %}
+    <button class="btn btn-danger" style="float: right;" id="follow">Unfollow</button>
+{% endif %}
+<div class="bottom-border">
+</div>
+<br/>
+{% if user_visiting.profile.bio is not None %}
+{{ user_visiting.profile.bio }}
+{% else %}
+<p style="font-style: italic;"> There's nothing here... </p>
+{% endif %}
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+// ajax script to follow/unfollow and adjust button accordingly
+
+    $(function () {
+        $('button').on('click', function () {
+            $.ajax({
+                url: '{% url 'other-profile' username=user_visiting.username %}',
+
+            })
+            var but = document.getElementById('follow');
+            if(but.innerHTML == 'Follow Me'){
+                $(but).removeClass('btn btn-primary');
+                $(but).addClass('btn btn-danger');
+                but.innerHTML = 'Unfollow';
+            } else {
+                $(but).removeClass('btn btn-danger');
+                $(but).addClass('btn btn-primary');
+                but.innerHTML = 'Follow Me';
+            }
+
+        })
+    });
+</script>
+{% endblock %}

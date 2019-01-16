@@ -1,0 +1,49 @@
+html, body{
+    background-color: #ced0b757 !important;
+    height: 100%;
+    display: block;
+    overflow: auto;
+}
+
+.login-box {
+    display: block;
+    overflow: hidden;
+	background: rgb(0,0,0,0.05);
+	padding: 60px;
+	color: black;
+	font-size: 16;
+	margin: 0 auto;
+	margin-top: 60px;
+	text-align: center;
+}
+
+.login-box p{
+    font-style: italic;
+}
+.login-form input {
+    margin: 0 auto;
+    width: 250px;
+    height: 30px;
+}
+ .bottom-border {
+ 	width 250px;
+ 	border-top: 1px solid black;
+ 	margin: 0 auto;
+ }
+
+.about-us h1{
+    margin-left: 25px;
+    margin-top: 25px;
+
+}
+.about-us p{
+    margin-top: 25px;
+    margin-left: 25px;
+    margin-right: 25px;
+    font-size: 16px;
+
+}
+.about-us h3{
+    margin-left: 25px;
+    margin-top: 25px;
+}

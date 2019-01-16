@@ -1,0 +1,131 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Chat with {{ partner.username }}  {% endblock %}
+{% block content %}
+{% if thread.accepted %}
+<br/>
+<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1><button class="btn btn-danger" style="float: right;" title="WARNING: THIS ENDS DEBATE">Close Debate</button>
+<div class="bottom-border">
+</div>
+<div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container">
+        <ul id='chat-items'>
+        {% for m in thread_messages %}
+            {% if m.user.username == 'DebatrAdmin' %}
+                <div class="alert alert-success" role="alert" style="margin-top:10px; margin-bottom:10px; width:90%; margin:0 auto;">
+                    <strong>DebatrAdmin</strong>
+                    <p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">{{ m.message }}<br/><strong>What is your topic?</strong></p>
+                    <small style="margin: 0 auto; font-style: italic;">{{ m.timestamp }}</small>
+                </div>
+            {% elif m.user == user %}
+                <div class="alert alert-primary" role="alert" style="margin-top:10px; margin-bottom:10px; width:90%; float: right;">
+                    <p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">{{ m.message }}</p>
+                    <small style="float: right; font-style: italic;">{{ m.timestamp }}</small>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary" role="alert" style="margin-top:10px; margin-bottom:10px; width: 90%; float: left;">
+                    <strong>{{ m.user }} </strong>
+                    <p style="margin-bottom:5px; margin-top:10px; width:95%; word-wrap: break-word;">{{ m.message }}</p>
+                    <small style="float: left; font-style: italic;">{{ m.timestamp }}</small>
+                </div>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        <script>
+            //scroll to bottom of chat
+            var objDiv = document.getElementById("container");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        </script>
+</div>
+
+<form method="post" style="margin-top: 20px;" id='form'>
+    {% csrf_token %}
+    {{ form | crispy }}
+    <input type="submit" value="Send" class="btn btn-primary"/>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript">
+//web-socket script for asynchronous messaging
+
+var loc = window.location
+var formData = $("#form")
+var msg = $("#id_message")
+var chatHolder = $("#chat-items")
+
+var wsStart = 'ws://'
+console.log(loc.protocol)
+//for production
+if(loc.protocol == 'https:'){
+    wsStart = 'wss://'
+}
+
+var endpoint = wsStart + loc.host + loc.pathname
+var socket = new ReconnectingWebSocket(endpoint)
+
+socket.onmessage = function(e){
+    console.log("message", e)
+    var chatData = JSON.parse(e.data)
+
+    // make sure style conforms, pass message to html
+    if(chatData.username == '{{ user.username }}'){
+        chatHolder.append('<div class="alert alert-primary" role="alert" style="margin-top:10px; margin-bottom:10px; width:90%; margin-left:10%;">' +
+                '<p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">' + chatData.message + '</p>' +
+                '<small style="margin-left: 85%; font-style: italic;">' + moment().format('MMM Do YYYY, h:mm a') + '</small>' +
+                '</div>')
+    } else {
+        chatHolder.append('<div class="alert alert-secondary" role="alert" style="margin-top:10px; margin-bottom:10px; width: 90%; margin-right: 10%;">' +
+                '<strong>' + chatData.username + '</strong>' +
+                '<p style="margin-bottom:5px; margin-top:10px; width:95%; word-wrap: break-word;">' + chatData.message + '</p>' +
+                '<small style="margin-right: 85%; font-style: italic;">' + moment().format('MMM Do YYYY, h:mm a') + '</small>' +
+                '</div>')
+    }
+
+    //scroll to new bottom
+    var objDiv = document.getElementById("container");
+    objDiv.scrollTop = objDiv.scrollHeight;
+}
+socket.onopen = function(e){
+    console.log("open", e)
+    formData.submit(function(event){
+        event.preventDefault()
+        var msgText = msg.val()
+        var msgData = {
+            'message': msgText
+        }
+        socket.send(JSON.stringify(msgData))
+        formData[0].reset()
+    })
+}
+socket.onerror = function(e){
+    console.log("error", e)
+}
+socket.onclose = function(e){
+    console.log("close", e)
+}
+
+</script>
+{% else %}
+<br/>
+<h1> Pending Debate with {{ partner.username }}</h1>
+<div class="bottom-border">
+</div>
+<br/>
+<h3 style="display: inline-block; margin-right: 5px;">Topic:  </h3> <p style="font-style: italic; display: inline-block;"> {{ thread.topic }}</p>
+<br/>
+<h3 style="display: inline-block; margin-right: 5px;">Requested By: </h3> <p style="font-style: italic; display: inline-block;"> {{ thread.user_one }} </p>
+<br/>
+<h3 style="display: inline-block; margin-right: 5px;">Requested On: </h3> <p style="font-style: italic; display: inline-block;"> {{ thread.timestamp }} </p>
+<br/>
+{% if thread.user_one == user %}
+<a class="btn btn-danger" style="margin-left: 45%; color: white;" href="{% url 'decline' thread_id=thread.id %}">Retract Request</a>
+{% else %}
+<div class="container" style="margin-left:35%">
+<a class="btn btn-primary" style="color: white; margin: 0 auto;" href="{% url 'accept' username=thread.user_one.username %}">Accept Request</a>
+<a class="btn btn-danger" style="color: white; margin: 0 auto;" href="{% url 'decline' thread_id=thread.id %}">Decline Request</a>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

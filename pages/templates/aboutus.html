@@ -1,0 +1,45 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} About Debatr {% endblock %}
+{% block content %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
+</head>
+<div class = "about-us">
+    <h1> What is Debatr? </h1>
+    <div class = "bottom-border">
+    </div>
+    <p> Debatr&copy; is an <b>innovative, open-source </b> platform which allows people from around the globe to engage in
+        informed and respectful discourse about the most pressing issues of our time. Additionally, we serve the community
+        by providing impartial and informative articles, videos and other resources on pressing topics, curated by staff and users.
+    </p>
+    <p>
+        From <b>social issues</b> to <b>economics, ethics and metaphysics</b>, Debatr&copy; aims to drive humanity away from
+        our conformative bias tendencies towards real logical dialogue and, thus, hopefully, closer to real answers!
+    </p>
+    <h1>Services</h1>
+    <div class = "bottom-border">
+    </div>
+    <p>We offer <b>two</b> mediums by which users can engage in discourse</p>
+    <p><b>1)</b> A simple text-based messaging debate client in where two users can discuss a selected issue via instant message</p>
+    <p><b>2)</b> A video client, in where two or more users engage live, face-to-face at an agreed upon time for an agreed upon period</p>
+    <p>We also hope to implement <b>user pages</b>, which will allow users to follow one another, share past debates, stream live debates and more</p>
+    <p>In addition, we hope to provide our community with informative articles, videos and other resources under our "For Your Consideration" tab to help drive the conversation.</p>
+    <h1>Rules</h1>
+    <div class = "bottom-border">
+    </div>
+    <p>We are very well aware of the potential for Debatr&copy; to fall into an abyss of logical fallacy and childish argument, which
+    is far from what we want! The goal of Debatr&copy; is to foster a <b>safe</b> place to question our presumed assumptions about the world. However, this does not
+    mean we are tolerant of <b>racism, xenophobia and pseudo-science</b>.</p>
+    <p>Thus, we are in the works of implementing various <b>AI solutions</b> to ensure debates are not ridden with bickering, un-cited claims, ad hominems and other common logical
+    fallacies.</p>
+    <p>The general rules for debates are as follows:</p>
+    <p><b>1)</b> No ad hominems (Repeated use of ad hominems will result in account suspension!)</p>
+    <p><b>2)</b> Making a scientific claim (e.g. from research, statistics, etc.)? Cite it!</p>
+    <p><b>3)</b> Watch your other logical fallacies (we offer you a fallacy reference in both debate platforms)</p>
+    <p><b>4)</b> Dont bicker!</p>
+</div>
+</html>
+
+{% endblock %}

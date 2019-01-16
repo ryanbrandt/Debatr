@@ -1,0 +1,24 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} {{ user.username }}'s Profile {% endblock %}
+{% block content %}
+<br/>
+<img src = "{{ user.profile.image.url }}" class = "rounded-circle" style="margin-left: auto; margin-right: auto; display: block; width: 15%; margin-bottom: 30px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 275px; height: 280px;">
+<form action = "{% url 'update-profile' %}">
+    <button class = "btn btn-primary" type = "submit" style="display: inline-block;">Update Profile/User Info</button><strong style="float: right;">Followers: {{ follower_count }}</strong>
+    <br/>
+    <strong style="float: right;">Following: {{ following_count }}</strong>
+</form>
+<br/>
+<br/>
+<h3>About Me</h3>
+<div class="bottom-border">
+</div>
+<br/>
+{% if user.profile.bio is not None %}
+{{ user.profile.bio }}
+{% else %}
+<p style="font-style: italic;"> There's nothing here... </p>
+{% endif %}
+
+{% endblock %}

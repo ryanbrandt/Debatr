@@ -1,0 +1,37 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} {{ user.username }}'s Debate Feed {% endblock %}
+{% block content %}
+<br/>
+<h1>{{ user.username}}'s Debate Feed</h1>
+<div class="bottom-border">
+</div>
+<br/>
+{% if not threads %}
+<p style="font-style: italic;">There's nothing here...</p>
+{% endif %}
+{% for result in threads %}
+    {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <div class="card-body">
+                <strong><h3 class="card-title" style="text-align: center;">{{ result.topic }}</h3></strong>
+                <img src = "{{ result.user_one.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <img src = "{{ result.user_two.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px; float: right;">
+                <br/>
+                <strong style="float: left;">{{ result.user_one.username }}</strong>
+                <strong style="float: right;">{{ result.user_two.username }}</strong>
+                <br/>
+                <br/>
+                <a href="{% url 'spectate' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 20%; margin-bottom: 5px;">Spectate Debate</a>
+                <a href="{% url 'unfollow_thread' thread_id=result.id %}" class="btn btn-danger" style="margin-left: 32%;">Unfollow</a>
+                <br/>
+                <br/>
+                <small style="text-align: center;">Last active: {{ result.timestamp }}</small>
+           </div>
+         </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+{% endfor %}
+{% endblock %}

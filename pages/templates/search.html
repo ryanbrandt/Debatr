@@ -1,0 +1,69 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} Welcome to Debatr! {% endblock %}
+{% block content %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
+    <body>
+    <h3 style="margin-top: 20px;">User Results for Search "{{ query }}"</h3>
+    <div class = "bottom-border" style="margin-bottom: 20px;">
+    </div>
+    {% if not results %}
+    <small style="font-style: italic;">There's nothing here...</small>
+    {% endif %}
+    {% for result in results %}
+        {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <img class="rounded-circle" src="{{ result.profile.image.url }}" alt="Card image cap" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 275px; height: 280px; display: block; margin: auto;">
+            <div class="card-body">
+                 <h5 class="card-title">{{ result.username }}</h5>
+                <p class="card-text">{% for i in result.profile.tags.all|slice:"3" %}<span class="badge badge-light" style="margin-right:5px; margin-bottom: 5px; padding: 4px;"><a href="http://wikipedia.com/wiki/{{ i.tag }}" style="text-decoration: none; color: black;">{{ i.tag }}</a> </span>{% endfor %}</p>
+                {% if not result.profile.tags.all %}
+                <p class="card-text"><span style="margin-right:5px; margin-bottom:5px; font-style: italic;"><small>theres nothing here...</small></span> </p>
+                {% endif %}
+                <a href="{% url 'other-profile' username=result.username %}" class="btn btn-primary">View Profile</a>
+                <a href="{% url 'thread' username=result.username %}" class="btn btn-primary">Debate!</a>
+           </div>
+         </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+    {% endfor %}
+    <h3 style="margin-top: 20px;">Debate Results for Search "{{ query }}"</h3>
+    <div class = "bottom-border" style="margin-bottom: 20px;">
+    </div>
+    {% if not thread_results %}
+    <small style="font-style: italic;">There's nothing here...</small>
+    {% endif %}
+    {% for result in thread_results %}
+        {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <div class="card-body">
+                <strong><h3 class="card-title" style="text-align: center;">{{ result.topic }}</h3></strong>
+                <img src = "{{ result.user_one.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <img src = "{{ result.user_two.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px; float: right;">
+                <br/>
+                <strong style="float: left;">{{ result.user_one.username }}</strong>
+                <strong style="float: right;">{{ result.user_two.username }}</strong>
+                <br/>
+                <br/>
+                <a href="{% url 'spectate' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 20%; margin-bottom: 5px;">Spectate Debate</a>
+                {% if result not in user.profile.threads.all %}
+                    <a href="{% url 'follow_thread' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 23.5%">Follow Debate</a>
+                {% else %}
+                    <a href="{% url 'unfollow_thread' thread_id=result.id %}" class="btn btn-danger" style="margin-left: 32%;">Unfollow</a>
+                {% endif %}
+           </div>
+         </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+    {% endfor %}
+    </body>
+</head>
+</html>
+
+{% endblock %}

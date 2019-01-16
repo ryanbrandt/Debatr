@@ -1,0 +1,150 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Debate Spectate {% endblock %}
+{% block content %}
+<br/>
+<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1>{% if thread not in user.profile.threads.all %}<a class="btn btn-primary" style="float: right;" href="{% url 'follow_thread' thread_id=thread.id %}">Follow Debate</a>{% else %}<a class="btn btn-danger" style="float: right; color: white;" href="{% url 'unfollow_thread' thread_id=thread.id %}">Unfollow</a> {% endif %}
+<div class="bottom-border">
+</div>
+<div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container">
+        <ul id='chat-items'>
+        {% for m in thread_messages %}
+            {% if m.user == thread.user_one %}
+                <div class="alert alert-primary" role="alert" style="margin-top:10px; margin-bottom:10px; width:90%; float: right;">
+                    <strong>{{ m.user }}</strong>
+                    <p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">{{ m.message }}</p>
+                    <small style="float: left; font-style: italic;">{{ m.timestamp }}</small>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary" role="alert" style="margin-top:10px; margin-bottom:10px; width: 90%; float: left;">
+                    <strong>{{ m.user }} </strong>
+                    <p style="margin-bottom:5px; margin-top:10px; width:95%; word-wrap: break-word;">{{ m.message }}</p>
+                    <small style="float: right; font-style: italic;">{{ m.timestamp }}</small>
+                </div>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        <script>
+            //scroll to bottom of chat
+            var objDiv = document.getElementById("container");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        </script>
+</div>
+<br/>
+<h1>Comments</h1>
+<div class="bottom-border">
+</div>
+{% if not comments %}
+    <small style="font-style: italic">There's nothing here...</small>
+{% endif %}
+<div class="container" style="height: 25vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container-two">
+        <ul id='comment-items'>
+            {% for comment in comments %}
+            <div class="alert alert-light" style="margin-top: 10px; margin-bottom: 10px;">
+                <strong><a href="{% url 'other-profile' username=user.username %}" style="text-decoration: none; color: gray;">{{ comment.user.username }}</a></strong>
+                <p style="margin-bottom: 5px; margin-top: 10px; width: 95%; word-wrap: break-word;">{{ comment.comment }}</p>
+                <small style="float: left; font-style: italic;">{{ comment.timestamp }}</small>
+                <br/>
+            </div>
+            {% endfor %}
+        </ul>
+        <script>
+            //scroll to bottom of chat
+            var objDiv = document.getElementById("container-two");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        </script>
+</div>
+
+<form method="post" class="comment-form" id="commenting">
+    {% csrf_token %}
+    {{ form | crispy }}
+    <button class="btn btn-primary" type="submit">Post Comment</button>
+</form>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+<script>
+
+// ajax script to update comments when user submits a new one
+
+    $(document).on('submit', '.comment-form', function(event){
+    // takes class acknowledge-form, need to get instance to get id which contains notification
+        event.preventDefault();
+        var comment = $(this).serializeArray()[1].value;
+        console.log("comment: " + comment.value + " submitted");
+        // pass to create_comment to handle real-time add to DOM and DB saving
+        create_comment(comment)
+    });
+    function create_comment(comment){
+        console.log("comment being created")
+        $.ajax({
+            url: "{% url 'spectate' thread_id=thread.id %}",
+            type: "POST",
+            data: {'comment': comment, 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
+
+            //on success, save to DB and add to DOM; make sure not empty
+            success: function() {
+                if(comment){
+                    $('#comment-items').append('<div class="alert alert-light" style="margin-top: 10px; margin-bottom: 10px;">' +
+                    '<strong>' + '<a href="{% url 'other-profile' username=user.username %}" style="text-decoration: none; color: gray;">' + '{{ user.username }}' + '</strong>' + '</a>' +
+                    '<p style="margin-bottom: 5px; margin-top: 10px; width: 95%; word-wrap: break-word;">' + comment + '</p>' +
+                    '<small style="margin-right: 85%; font-style: italic;">' +  moment().format('MMM Do YYYY, h:mm a') + '</small>' +
+                    '</div>');
+                    document.getElementById("commenting").reset();
+                    //scroll to bottom of comments
+                    var objDiv = document.getElementById("container-two");
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                }
+                console.log("success");
+            },
+            error: function(xhr,err){
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+
+        });
+    };
+</script>
+<script>
+// seperate ajax script to fetch new messages every 15 seconds, sharing websocket is burdenous
+
+ function executeQuery() {
+  $.ajax({
+    url: '{% url 'spectate' thread_id=thread.id %}',
+
+    success: function(data) {
+        console.log('success');
+        for(var i = 0; i < data.length; i++){
+            var cur = data[i].fields
+            var timestamp = cur.timestamp;
+            var formattedTime = moment(timestamp).format('MMM Do YYYY, h:mm a');
+            if(cur.user == {{ thread.user_one.id }}){
+                $('#chat-items').append('<div class="alert alert-primary" role="alert" style="margin-top:10px; margin-bottom:10px; width:90%; margin-left:10%;">' +
+                    '<strong>' + '{{ thread.user_one.username }}' + '</strong>' +
+                    '<p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">' + cur.message + '</p>' +
+                    '<small style="margin-right: 85%; font-style: italic;">' + formattedTime + '</small>' +
+                    '</div>');
+            } else {
+                $('#chat-items').append('<div class="alert alert-secondary" role="alert" style="margin-top:10px; margin-bottom:10px; width: 90%; margin-right: 10%;">' +
+                    '<strong>' + '{{ thread.user_two.username }}' + '</strong>' +
+                    '<p style="margin-bottom: 5px; margin-top:10px; width:95%; word-wrap: break-word">' + cur.message + '</p>' +
+                    '<small style="margin-right: 85%; font-style: italic;">' + formattedTime + '</small>' +
+                    '</div>');
+
+            }
+            //scroll to bottom of comments
+            var objDiv = document.getElementById("container");
+            objDiv.scrollTop = objDiv.scrollHeight
+        }
+      // do something with the return value here if you like
+    }
+  });
+  setTimeout(executeQuery, 15000); // you could choose not to continue on failure...
+}
+
+$(document).ready(function() {
+  // run the first time; all subsequent calls will take care of themselves
+  setTimeout(executeQuery, 15000);
+});
+
+</script>
+{% endblock %}

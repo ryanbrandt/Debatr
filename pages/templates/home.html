@@ -1,0 +1,62 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Welcome to Debatr! {% endblock %}
+{% block content %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
+    <body>
+
+        <div class = "login-box">
+            <h3> Welcome to Debatr! </h3>
+            <div class = "bottom-border">
+            </div>
+            <br/>
+            <p>Fueling intelligent discourse around the world</p>
+            <br/>
+            {% if not user.is_authenticated %}
+            <form action = "{% url 'login' %}">
+                <button class = "btn btn-primary" type = "submit">Log In</button>
+            </form>
+            <br/>
+            <small><a href = "{% url 'join' %}">Not a member? Join today!</a></small>
+            {% else %}
+            <p>Hello, <b>{{user.username}}</b>!</p>
+            <small><a href = "#">New to Debatr? Here's how to get started</a></small>
+            <br/>
+            <br/>
+            <form action = "{% url 'logout' %}">
+                <button class = "btn btn-primary" type = "submit">Log Out</button>
+            </form>
+            {% endif %}
+        </div>
+        <br/>
+        {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <button class="btn btn-primary">Share</button>
+        </form>
+        <div class="container" style="height: 70vh; overflow-y: auto; margin-top: 20px; bottom: 0;" id="container-two">
+            {% for post in recent_feed %}
+                <div class="alert alert-warning">
+                    <img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
+                    <strong style="display: inline-block;">{{ post.author.username }}</strong>
+                    {% if post.post_type %}
+                        <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
+                    {% endif %}
+                    <br/>
+                    <p>{{ post.content }}</p>
+                    <small>{{ post.date_posted }}</small>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </body>
+
+</head>
+
+</html>
+
+{% endblock %}

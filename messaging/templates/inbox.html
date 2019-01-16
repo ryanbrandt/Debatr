@@ -1,0 +1,36 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} {{ user.username }}'s Inbox {% endblock %}
+{% block content %}
+<br/>
+<h1>{{ user.username}}'s Inbox</h1>
+<div class="bottom-border">
+</div>
+<br/>
+{% if not threads %}
+<p style="font-style: italic;">There's nothing here...</p>
+{% endif %}
+<div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0; float: left;" id="container">
+    {% for thread in threads %}
+        <div id="first" style="width:20%; float:left; height:30%; ">
+            {% if thread.user_one == user %}
+                <img src = "{{ thread.user_two.profile.image.url }}" class = "rounded-circle" style=" margin-right: auto; margin-left: 20px; display: block; width: 40%; margin-bottom: 10px;background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <a href ="{% url 'thread' username=thread.user_two %}" class="btn btn-primary">Debate with {{ thread.user_two }}</a>
+            {% else %}
+                <img src = "{{ thread.user_one.profile.image.url }}" class = "rounded-circle" style=" margin-right: auto; margin-left: 20px; display: block; width: 40%; margin-bottom: 10px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <a href="{% url 'thread' username=thread.user_one %}" class="btn btn-primary">Debate with {{ thread.user_one }}</a>
+            {% endif %}
+            <br/>
+            <small><strong>{{ thread.topic }}</strong></small>
+            <br/>
+            <small>{{ thread.timestamp }}</small>
+            <br/>
+            <br/>
+        </div>
+        <div id="second" style="width: 70%; float: left; height: 30%;">
+            <div class="alert alert-secondary" role="alert" style="margin-top:10px; margin-bottom:10px; width: 90%; margin-right: 10%; height: 70%;"> {{ forloop.counter }} TODO! </div>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
