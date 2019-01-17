@@ -12,6 +12,8 @@ from messaging.models import Thread
 # homepage view
 # TODO: ajax for making posts and fetching posts; add replies?
 def home(request):
+    form = None
+    recent_feed = None
     if request.user.is_authenticated:
         user = request.user
         form = PostCreationForm()
@@ -24,6 +26,9 @@ def home(request):
             form.save(user)
     return render(request, "home.html", {'form': form, 'recent_feed': recent_feed})
 
+@login_required
+def getting_started(request):
+    return render(request, 'getting_started.html', {})
 
 # about-us view
 def aboutus(request):

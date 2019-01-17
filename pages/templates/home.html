@@ -23,7 +23,7 @@
             <small><a href = "{% url 'join' %}">Not a member? Join today!</a></small>
             {% else %}
             <p>Hello, <b>{{user.username}}</b>!</p>
-            <small><a href = "#">New to Debatr? Here's how to get started</a></small>
+            <small><a href = "{% url 'getting-started' %}">New to Debatr? Here's how to get started</a></small>
             <br/>
             <br/>
             <form action = "{% url 'logout' %}">

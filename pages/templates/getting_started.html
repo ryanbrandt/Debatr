@@ -1,0 +1,125 @@
+{% extends 'navBar.html' %}
+{% load static %}
+{% block title %} Getting Started {% endblock %}
+{% block content %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
+</head>
+<div class = "about-us">
+    <p> Debatr&copy; is an <b>innovative, open-source </b> platform which allows people from around the globe to engage in
+        informed and respectful discourse about the most pressing issues of our time.
+    </p>
+    <h1> Where to Start </h1>
+    <div class = "bottom-border">
+    </div>
+    <strong><p style="font-style: italic;">Welcome and thanks for joining! </p></strong>
+    <p>
+        There are a few key things you'll want to do to get started as a new member of this engaging online community
+    </p>
+    <p>
+        <h3>Set up Your Profile</h3>
+            <ul style="margin-left: 7%;": 10px;>
+                <li>Go to 'My Profile' in the navigation bar</li>
+                <li>Select 'Update Profile/User Info'</li>
+                <li>Upload a profile picture of yourself</li>
+                <li>Add a simple bio to let the community know a bit about yourself-- your background, involvements, and so on</li>
+                <li>Add interests as comma-seperated or spaced keywords (e.g. epistemology, ethics); we use these to connect you to other users for debates with our matching algorithm</li>
+                <li>Update your username or email address, if ever necessary or desired</li>
+            </ul>
+    </p>
+    <p>
+        <h3>Follow Other Members in the Community</h3>
+        <ul style="margin-left: 7%;">
+            <li>
+                Search for users/interests in the search bar on the navigation bar
+            </li>
+                    <ul>
+                        <li>This will return a selection of users based off your query</li>
+                        <li>The results will search for users based off your query against username and your query against user interests</li>
+                        <li>So if you search 'politics', you'll get an array of users interested in politics; if you search a specific username, you'll get the user by that username</li>
+                        <li>From here, you can simply go to any of these user's profile's and select 'Follow'</li>
+                        <li>Any posts these user's make or any debates they are a part of, you will now have access to in your home feed</li>
+                    </ul>
+            <br/>
+            <li>
+                Get Our Recommendations
+            </li>
+                    <ul>
+                        <li>If you've filled out your interests or participated in any debates, we will have recommended users (in addition to ongoing debates) listed under 'For You' under your feed on your home page</li>
+                    </ul>
+        </ul>
+
+    </p>
+    <p>
+        <h3>Get Involved</h3>
+    <p style="margin-left: 7%; margin-top:0%;"> Once you've let the community know a bit about yourself and connected to others, we have a handful of ways for you to get involved</p>
+    <ul style="margin-left: 7%">
+        <li>Get Debating</li>
+            <ul>
+                <li>As mentioned above, you can search for users and issues in the search bar on the navigation bar</li>
+                    <ul>
+                        <li>Simply find a user based off their username or interests and select 'Debate!' from the search screen to get started</li>
+                    </ul>
+                <br/>
+                <li>We also offer a matchmaking system to bring users together to debate issues based off their interests and sentiment ratings</li>
+                    <ul>
+                        <li>Go to 'Debate' in the navigation bar and select 'Debate Match'</li>
+                        <li>This system will automatically match you with other users based off your interests, the debates you have participated in, the debates you have spectated and the sentiment ratings you provided</li>
+                        <li>You will also have the option to tinker with some settings if you are looking for something more specific at any given time</li>
+                    </ul>
+            </ul>
+        <br/>
+        <li>Get Talking</li>
+            <ul>
+                <li>From your home page, you will notice we have a post and feed system</li>
+                <li>All of your posts are automatically visible to your followers in their home feed</li>
+                <li>Your posts are also visible on the 'Global Feed' page which compiles all posts within the community</li>
+                <li>Posts are not for debating, but rather for seeking debates or information and sharing information with the community</li>
+                <li>If you choose to share any outside sources (articles, videos, and so on), make sure they are reliable! We periodically remove, if any, posts sharing pseudo-scientific resources and other intellectually dishonest materials</li>
+            </ul>
+    </ul>
+    </p>
+    <p>
+        <h3>Some Debatr Idiosyncrasies</h3>
+        <ul style="margin-left: 7%;">
+            <li>On Followers/Following</li>
+            <ul>
+                <li>Don't panic: others can't see how many/who you are following and how many users/who is following you</li>
+                <li>You can see on your profile how many people and who you are following as well as how many people are following you, but you cant see who is following you</li>
+                <li>Our reasoning: Debatr&copy; is a debating community; thus, we want words and reason to rule, not authority by follower count</li>
+                <li>Thus, you should now have an opportunity to follow and engage with people within the community purely based off their ideas and reasoning, rather than their social credibility</li>
+            </ul>
+            <br/>
+            <li>On What Belongs Here and What Doesn't</li>
+            <p>We are not for censorship of ideas, however this is a community for <strong>rational, fair and respectful</strong> discussion</p>
+            <ul>
+                <li>Rational</li>
+                    <ul>
+                        <li>If you're sharing something rooted in a non-objective theory, is it logically consistent and free of traditional logical fallacies?</li>
+                        <li>Or is it rooted in cognitive bias as you try to assert an opinion you are treating as objective?</li>
+                        <li>We prefer the former! While we cant parse everything for fallacies at the moment, we ask that you ask these questions of yourself before you post (and maybe we'll have a solution soon?)</li>
+                    </ul>
+                <li>Fair</li>
+                    <ul>
+                        <li>Everyone who abides to the rational and respectful duo has a platform at Debatr&copy;</li>
+                        <li>Please, try to hear people out if you disagree with them on an issue; they should hear you out as well--this is only fair, and we hope that both parties will can come to an agreeable conclusion through dialectic</li>
+                    </ul>
+                <li>Respectful</li>
+                    <ul>
+                        <li>Bigots be warned: this is not a platform for you</li>
+                        <li>Racism, sexism and xenophobia are not tolerated</li>
+                        <li>In a debate setting, be respectful of your debate partner, let them articulate their argument and be mature</li>
+                    </ul>
+            </ul>
+
+        </ul>
+
+
+
+    </p>
+
+</div>
+</html>
+
+{% endblock %}
