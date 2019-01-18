@@ -162,7 +162,7 @@ def unfollow_thread(request, thread_id):
     return spectate(request, thread_id)
 
 
-# TODO: add ajax for unfollowing!
+# TODO: add ajax for unfollowing debates like unfollowing users works
 @login_required
 def debate_feed(request, username):
     user = request.user

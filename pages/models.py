@@ -5,7 +5,8 @@ from messaging.models import Thread
 from PIL import Image
 
 ''' Models for General Webpages '''
-# TODO: figure out graph DB for following people/debates
+
+# TODO: add 'followed debates' to profiles
 
 
 # model for tagging system
@@ -26,10 +27,7 @@ class Post(models.Model):
         ('SI', 'Seeking information'),
     )
     post_type = models.CharField(max_length=1, choices=post_choices)
-
-    # toString
-    def __str__(self):
-        return(self.title)
+    post_image = models.ImageField(default=None, null=True)
 
 
 # user profile model
@@ -43,7 +41,6 @@ class Profile(models.Model):
     tags = models.ManyToManyField(Tag)
     threads = models.ManyToManyField(Thread)
     following = models.ManyToManyField(User, related_name='following')
-
 
     # toString
     def __str__(self):

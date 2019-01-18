@@ -69,22 +69,24 @@ class ProfileUpdateForm(forms.ModelForm):
                     cur_tag = Tag.objects.create(tag=interest)
                     instance.tags.add(cur_tag)
 
+
 # simple post creation form for user 'feed' posts
 class PostCreationForm(forms.Form):
-    post = forms.CharField(required=False)
+    post = forms.CharField(required=True)
     post_type = forms.ChoiceField(required=False, choices=Post.post_choices)
+    post_image = forms.ImageField(required=False)
 
     class Meta:
         model = Post
-        fields = ['post', 'post_type']
-
+        fields = ['post', 'post_type', 'post_image']
 
     def __init__(self, *args, **kwargs):
         super(PostCreationForm, self).__init__(*args, **kwargs)
         self.fields['post_type'].label = 'Post Type'
-        self.fields['post'].help_text = 'Only your followers can view your posts'
+        self.fields['post'].help_text = 'Sent directly to your followers and the global feed'
         self.fields['post_type'].help_text = 'Optional post category so your followers know what/why your sharing'
+        self.fields['post_image'].help_text = 'Share an image'
 
-    def save(self, user):
+    def save(self, user, post_type):
         data = self.cleaned_data
-        Post.objects.create(content=data['post'], author=user, post_type=data['post_type'])
+        Post.objects.create(content=data['post'], author=user, post_type=post_type)

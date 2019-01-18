@@ -6,29 +6,56 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from pages.models import User, Profile, Post
 from messaging.models import Thread
+from datetime import datetime
+from datetime import timedelta
+from django.core import serializers
+from django.http import HttpResponse
+import json
 
 ''' Views for simple webpages application '''
 
+
 # homepage view
-# TODO: ajax for making posts and fetching posts; add replies?
+# TODO: post like system? post replies? see more posts? global post feed, integrate post images into front end
 def home(request):
     form = None
     recent_feed = None
+
     if request.user.is_authenticated:
         user = request.user
         form = PostCreationForm()
-        recent_feed = Post.objects.filter(author__in=user.profile.following.all()).order_by('-date_posted')[:30]
+        recent_feed = Post.objects.filter(Q(author__in=user.profile.following.all()) | Q(author=user)).order_by('-date_posted')[:30]
 
     if request.method == 'POST':
         form = PostCreationForm(request.POST)
+        post_type = request.POST.get('type')
 
         if form.is_valid():
-            form.save(user)
+            form.save(user, post_type)
+
+    # ajax if user submits new post or every 15 seconds, fetch unseen posts pass to js
+    if request.is_ajax():
+        last_time = datetime.now() - timedelta(seconds=15)
+        new_posts = Post.objects.filter(date_posted__gt=last_time)
+
+        # not best way to do this, should be scalable since frequent, would have to revisit for large user base
+        new_posts = serializers.serialize('json', new_posts)
+        new_posts = json.loads(new_posts)
+        for post in new_posts:
+            cur_id = int(post['fields']['author'])
+            post['fields']['username'] = User.objects.get(id=cur_id).username
+            post['fields']['image'] = User.objects.get(id=cur_id).profile.image.url
+
+        new_posts = json.dumps(new_posts)
+        return HttpResponse(new_posts, content_type='application/json')
+
     return render(request, "home.html", {'form': form, 'recent_feed': recent_feed})
+
 
 @login_required
 def getting_started(request):
     return render(request, 'getting_started.html', {})
+
 
 # about-us view
 def aboutus(request):
@@ -96,7 +123,7 @@ def trending(request):
     return render(request, "trending.html", {})
 
 
-# TODO: make some sort of blog thing
+# TODO: make some sort of blog thing?
 @login_required
 def consideration(request):
     return render(request, "consideration.html", {})
@@ -127,6 +154,9 @@ def search(request, username=None):
 def other_profile(request, username):
         # get user with username selected from search, need fields to populate template
         user_visiting = User.objects.get(username=username)
+        # send to profile view if owner of profile
+        if request.user == user_visiting:
+            return redirect('profile', username=username)
         # send to template as user_visiting so user (logged in user) isn't overwritten and navBar functions correctly
         if request.is_ajax():
             cur_user = request.user

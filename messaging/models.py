@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 
 ''' Models for messaging application '''
 
+# TODO: add debate archiving system for closed debates
+
 
 # thread objects, associates two users to one chat thread and a timestamp
 class Thread(models.Model):

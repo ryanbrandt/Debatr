@@ -7,7 +7,6 @@
 <head>
     <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
     <body>
-
         <div class = "login-box">
             <h3> Welcome to Debatr! </h3>
             <div class = "bottom-border">
@@ -32,17 +31,21 @@
             {% endif %}
         </div>
         <br/>
+        <br/>
         {% if user.is_authenticated %}
-        <form method="post">
+        <img src = {{ user.profile.image.url }} style="height: 10%; width: 10%;" class="rounded-circle">
+        <form method="post" class="post-form">
             {% csrf_token %}
             {{ form | crispy }}
-            <button class="btn btn-primary">Share</button>
+            <button class="btn btn-primary" type="submit">Share</button>
         </form>
         <div class="container" style="height: 70vh; overflow-y: auto; margin-top: 20px; bottom: 0;" id="container-two">
+            <ul id="post-items">
             {% for post in recent_feed %}
-                <div class="alert alert-warning">
+                {% if post.author != user %}
+                <div class="alert alert-secondary">
                     <img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
-                    <strong style="display: inline-block;">{{ post.author.username }}</strong>
+                    <a href="{% url 'other-profile' username=post.author.username %}" style="text-decoration: none; color: inherit;"><strong style="display: inline-block;">{{ post.author.username }}</strong></a>
                     {% if post.post_type %}
                         <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
                     {% endif %}
@@ -50,13 +53,111 @@
                     <p>{{ post.content }}</p>
                     <small>{{ post.date_posted }}</small>
                 </div>
+                {% else %}
+                <div class="alert alert-primary">
+                    <img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
+                    <a href="{% url 'other-profile' username=post.author.username %}" style="text-decoration: none; color: inherit;"><strong style="display: inline-block;">{{ post.author.username }}</strong></a>
+                    {% if post.post_type %}
+                        <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
+                    {% endif %}
+                    <br/>
+                    <p>{{ post.content }}</p>
+                    <small>{{ post.date_posted }}</small>
+                </div>
+                {% endif %}
             {% endfor %}
+            </ul>
         </div>
         {% endif %}
     </body>
-
 </head>
 
 </html>
+
+{% if user.is_authenticated %}
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
+<script>
+
+    //global timer
+     var myTimer;
+    // ajax script to update posts on submit
+
+    $(document).on('submit', '.post-form', function(event){
+    // takes class acknowledge-form, need to get instance to get id which contains notification
+        event.preventDefault();
+        var form = $(this);
+        var post = $(this).serializeArray()[1].value;
+        var type = $(this).serializeArray()[2].value;
+        console.log(type);
+        console.log("post: " + post + " submitted");
+
+        // pass to create_comment to handle real-time add to DOM and DB saving
+        create_post(post, form, type)
+    });
+
+    function create_post(post, form, type){
+        console.log("post being created")
+        $.ajax({
+            url: "{% url 'home' %}",
+            type: "POST",
+            data: {'post': post, 'type': type, 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
+
+            //on success, save to DB and add to DOM; make sure not empty
+            success: function() {
+                if(post){
+                 //reset timer, execute query to fetch recent posts including one just posted
+                   clearTimeout(myTimer);
+                   executeQuery();
+
+                }
+                form[0].reset();
+                console.log("success");
+            },
+            error: function(xhr,err){
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+
+        });
+    };
+    //auto-fetch new messages every 15 seconds, reset on user submit post, add to DOM
+     function executeQuery() {
+      $.ajax({
+        url: '{% url 'home' %}',
+
+        success: function(data) {
+            console.log('fetch success');
+            for(var i = 0; i < data.length; i++){
+                var cur = data[i].fields;
+                console.log(cur);
+                var timestamp = cur.date_posted;
+                var formattedTime = moment(timestamp).format('MMM Do YYYY, h:mm a');
+                var url = '{% url 'other-profile' username="args" %}';
+                if(cur.username != '{{ user.username }}'){
+                    url = url.replace("args", cur.username);
+                    console.log(url);
+                    $('#post-items').prepend('<div class="alert alert-secondary">' + '<img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
+                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;">' + cur.username + '</strong>' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + '</p>' +
+                     '<small>' + formattedTime + '</small>' + '</div>');
+                } else {
+                    url = url.replace("args", '{{ user.username }}');
+                    $('#post-items').prepend('<div class="alert alert-primary">' + '<img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
+                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;" href=url>' + cur.username + '</strong >' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + '</p>' +
+                     '<small>' + formattedTime + '</small>' + '</div>');
+                }
+            }
+        }
+      });
+      setTimeout(executeQuery, 15000);
+    }
+
+     $(document).ready(function() {
+      // run the first time; all subsequent calls will take care of themselves
+      clearTimeout(myTimer);
+      myTimer = setTimeout(executeQuery, 15000);
+    });
+
+</script>
+{% endif %}
 
 {% endblock %}
