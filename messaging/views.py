@@ -11,7 +11,9 @@ from django.core import serializers
 from django.http import HttpResponse
 
 ''' Views for messaging application '''
-# TODO: fix retract & accept so they set directing notification to read
+
+# TODO: (DONE 01/18) fix retract & accept so they set directing notification to read
+
 
 # inbox view
 @login_required
@@ -101,6 +103,21 @@ def retract_or_decline(request, thread_id):
     user_one = thread.user_one
     user_two = thread.user_two
     thread.delete()
+    # set request notifcation to read, don't know if requester or requested denied so double try
+    try:
+        notif = 'New debate request from ' f'{user_one.username}'
+        notif_obj = Notification.objects.get(user=user_two, notification=notif)
+        notif_obj.read = True
+        notif_obj.save()
+    except Notification.DoesNotExist:
+        try:
+            notif = 'New debate request from ' f'{user_two.username}'
+            notif_obj = Notification.objects.get(user=user_one, notification=notif)
+            notif_obj.read = True
+            notif_obj.save()
+        except Notification.DoesNotExist:
+            pass
+
     return render(request, 'decline.html', {'one': user_one, 'two': user_two})
 
 
@@ -113,6 +130,15 @@ def accept(request, username):
     thread_accepted.accepted = True
     thread_accepted.save()
     messages.success(request, f'Debate on {thread_accepted.topic} with {partner.username} accepted! Get started below')
+    # set request notification to read
+    try:
+        notif = 'New debate request from ' f'{partner.username}'
+        notif_obj = Notification.objects.get(user=user, notification=notif)
+        notif_obj.read = True
+        notif_obj.save()
+    except Notification.DoesNotExist:
+        pass
+
     return redirect('thread', username=username)
 
 
@@ -122,6 +148,12 @@ def accept(request, username):
 def spectate(request, thread_id):
     thread = Thread.objects.get(id=thread_id)
     user = request.user
+
+    # FIXME: safety, see if we can get rid off
+    if user == thread.user_one:
+        return redirect('thread', username=thread.user_two.username)
+    if user == thread.user_two:
+        return redirect('thread', username=thread.user_one.username)
 
     if request.method == 'POST':
         form = DebateCommentForm(request.POST)

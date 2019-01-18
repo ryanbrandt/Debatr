@@ -33,35 +33,35 @@
         <br/>
         <br/>
         {% if user.is_authenticated %}
-        <img src = {{ user.profile.image.url }} style="height: 10%; width: 10%;" class="rounded-circle">
+        <img src = {{ user.profile.image.url }} style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;" class="rounded-circle">
         <form method="post" class="post-form">
             {% csrf_token %}
             {{ form | crispy }}
             <button class="btn btn-primary" type="submit">Share</button>
         </form>
-        <div class="container" style="height: 70vh; overflow-y: auto; margin-top: 20px; bottom: 0;" id="container-two">
+        <div class="container" style="display: flex; flex-direction: column; max-height: 100vh; overflow-y: auto; margin-top: 20px; bottom: 0;" id="container-two">
             <ul id="post-items">
             {% for post in recent_feed %}
                 {% if post.author != user %}
                 <div class="alert alert-secondary">
-                    <img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
+                    <img style="display: inline-block; float: left; margin-right: 5px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 45px; height: 50px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
                     <a href="{% url 'other-profile' username=post.author.username %}" style="text-decoration: none; color: inherit;"><strong style="display: inline-block;">{{ post.author.username }}</strong></a>
                     {% if post.post_type %}
                         <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
                     {% endif %}
                     <br/>
-                    <p>{{ post.content }}</p>
+                    <p>{{ post.content }} {% if post.post_type == 'ND' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
                     <small>{{ post.date_posted }}</small>
                 </div>
                 {% else %}
                 <div class="alert alert-primary">
-                    <img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
+                    <img style="display: inline-block; float: left; margin-right: 5px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 45px; height: 50px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
                     <a href="{% url 'other-profile' username=post.author.username %}" style="text-decoration: none; color: inherit;"><strong style="display: inline-block;">{{ post.author.username }}</strong></a>
                     {% if post.post_type %}
                         <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
                     {% endif %}
                     <br/>
-                    <p>{{ post.content }}</p>
+                    <p>{{ post.content }} {% if post.post_type == 'ND' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
                     <small>{{ post.date_posted }}</small>
                 </div>
                 {% endif %}
@@ -132,17 +132,24 @@
                 console.log(cur);
                 var timestamp = cur.date_posted;
                 var formattedTime = moment(timestamp).format('MMM Do YYYY, h:mm a');
+                // vars for dynamic django urls
                 var url = '{% url 'other-profile' username="args" %}';
+                var debLink = '';
+                if(cur.post_thread){
+                    var specUrl = '{% url 'spectate' thread_id="args" %}';
+                    specUrl = specUrl.replace("args", cur.post_thread);
+                    debLink = '<a href="' + specUrl + '" style="text-decoration: none; color: blue;">' + 'Spectate Now' + '</a>';
+                }
                 if(cur.username != '{{ user.username }}'){
                     url = url.replace("args", cur.username);
                     console.log(url);
-                    $('#post-items').prepend('<div class="alert alert-secondary">' + '<img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
-                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;">' + cur.username + '</strong>' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + '</p>' +
+                    $('#post-items').prepend('<div class="alert alert-secondary">' + '<img style="display: inline-block; float: left; margin-right: 5px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 45px; height: 50px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
+                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;">' + cur.username + '</strong>' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + ' ' + debLink + '</p>' +
                      '<small>' + formattedTime + '</small>' + '</div>');
                 } else {
                     url = url.replace("args", '{{ user.username }}');
-                    $('#post-items').prepend('<div class="alert alert-primary">' + '<img style="display: inline-block; float: left; height:4%; width: 4%; margin-right: 5px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
-                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;" href=url>' + cur.username + '</strong >' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + '</p>' +
+                    $('#post-items').prepend('<div class="alert alert-primary">' + '<img style="display: inline-block; float: left; margin-right: 5px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 45px; height: 50px;" class="rounded-circle" src=' + '"' + cur.image +'"' + '>' +
+                    '<a href="' + url + '" style="text-decoration: none; color: inherit;">' + '<strong style="display: inline-block;" href=url>' + cur.username + '</strong >' + '</a>' + '<small style="float: right; font-style: italic;">' + cur.post_type + '</small>' + '<p>' + cur.content + ' ' + debLink + '</p>' +
                      '<small>' + formattedTime + '</small>' + '</div>');
                 }
             }

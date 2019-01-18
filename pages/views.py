@@ -36,9 +36,9 @@ def home(request):
     # ajax if user submits new post or every 15 seconds, fetch unseen posts pass to js
     if request.is_ajax():
         last_time = datetime.now() - timedelta(seconds=15)
-        new_posts = Post.objects.filter(date_posted__gt=last_time)
+        new_posts = Post.objects.filter(Q(date_posted__gt=last_time) & (Q(author__in=user.profile.following.all()) | Q(author=user))).order_by('-date_posted')
 
-        # not best way to do this, should be scalable since frequent, would have to revisit for large user base
+        # FIXME: not best way to do this, should be scalable since frequent, would have to revisit for large user base
         new_posts = serializers.serialize('json', new_posts)
         new_posts = json.loads(new_posts)
         for post in new_posts:
@@ -87,13 +87,15 @@ def join(request):
 @login_required
 # user personal profile view
 def profile(request, username=None):
+    user = request.user
     # if user gets link to another users profile (e.g. my-profile/...) bring them to correct view
-    if username != request.user.username:
+    if username != user.username:
         return redirect('other-profile', username)
 
-    follower_count = Profile.objects.filter(following=request.user).count()
-    following_count = request.user.profile.following.count()
-    return render(request, "user_profile.html", {'follower_count': follower_count, 'following_count': following_count})
+    user_posts = Post.objects.filter(author=user)
+    follower_count = Profile.objects.filter(following=user).count()
+    following_count = user.profile.following.count()
+    return render(request, "user_profile.html", {'follower_count': follower_count, 'following_count': following_count, 'user_posts': user_posts})
 
 
 # user update profile view
@@ -167,5 +169,6 @@ def other_profile(request, username):
                 cur_user.profile.following.remove(user_visiting)
                 messages.success(request, f'{user_visiting.username} successfully unfollowed!')
 
-        return render(request, "other_profile.html", {'user_visiting': user_visiting})
+        user_posts = Post.objects.filter(author=user_visiting)
+        return render(request, "other_profile.html", {'user_visiting': user_visiting, 'user_posts': user_posts})
 

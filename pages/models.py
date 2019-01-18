@@ -25,9 +25,11 @@ class Post(models.Model):
         ('LFD', 'Looking for a debate'),
         ('FYC', 'For your consideration'),
         ('SI', 'Seeking information'),
+        ('ND', 'New Debate'),
     )
     post_type = models.CharField(max_length=1, choices=post_choices)
     post_image = models.ImageField(default=None, null=True)
+    post_thread = models.ForeignKey(Thread, default=None, null=True, on_delete=models.CASCADE)
 
 
 # user profile model
@@ -35,7 +37,7 @@ class Profile(models.Model):
     # associate user with Profile
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # user picture
-    image = models.ImageField(default='default.jpg', upload_to='profile_pictures')
+    image = models.ImageField(default='default.jpg')
     bio = models.CharField(null=True,max_length=500)
     interests = models.CharField(null=True, max_length=40)
     tags = models.ManyToManyField(Tag)

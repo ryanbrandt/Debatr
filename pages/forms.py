@@ -83,6 +83,7 @@ class PostCreationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(PostCreationForm, self).__init__(*args, **kwargs)
         self.fields['post_type'].label = 'Post Type'
+        self.fields['post_type'].choices = Post.post_choices[:-1]
         self.fields['post'].help_text = 'Sent directly to your followers and the global feed'
         self.fields['post_type'].help_text = 'Optional post category so your followers know what/why your sharing'
         self.fields['post_image'].help_text = 'Share an image'

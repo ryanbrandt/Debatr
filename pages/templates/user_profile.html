@@ -15,10 +15,27 @@
 <div class="bottom-border">
 </div>
 <br/>
-{% if user.profile.bio is not None %}
+<div class="container" style="height: 35vh; overflow-y: auto;">
+{% if user.profile.bio is not None and user.profile.bio != "" %}
 {{ user.profile.bio }}
 {% else %}
 <p style="font-style: italic;"> There's nothing here... </p>
 {% endif %}
-
+</div>
+<div class="container" style="display: flex; flex-direction: column; max-height: 100vh; overflow-y: auto; margin-top: 20px; bottom: 0;" id="container-two">
+    <ul id="post-items">
+        {% for post in user_posts %}
+            <div class="alert alert-primary">
+                    <img style="display: inline-block; float: left; margin-right: 5px; background-size: cover; border-radius: 50% 50% 50% 50%; width: 45px; height: 50px;" class="rounded-circle" src="{{ post.author.profile.image.url }}">
+                    <strong style="display: inline-block;">{{ post.author.username }}</strong>
+                    {% if post.post_type %}
+                        <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
+                    {% endif %}
+                    <br/>
+                    <p>{{ post.content }}</p>
+                    <small>{{ post.date_posted }}</small>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
