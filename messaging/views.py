@@ -25,8 +25,9 @@ def messaging(request, username):
         return redirect('home')
     else:
         # query db, get threads associated with user, sort by recent
-        threads = Thread.objects.filter(Q(user_one = user) | Q(user_two = user)).order_by('-timestamp')
+        threads = Thread.objects.filter((Q(user_one = user) | Q(user_two = user)) & Q(closed=False)).order_by('-timestamp')
         recent_msgs = []
+        # TODO
         for thread in threads:
             try:
                  recent_msgs.append(Message.objects.filter(Q(thread=thread)).order_by('-timestamp').first())
@@ -59,10 +60,12 @@ def thread(request, username):
 
     # retrieve thread if exists; if DNE, redirect to new thread view to make thread
     try:
-        cur_thread = Thread.objects.get(user_one=user, user_two=partner)
+        cur_thread = Thread.objects.get(user_one=user, user_two=partner, closed=False)
+
     except Thread.DoesNotExist:
         try:
-            cur_thread = Thread.objects.get(user_one=partner, user_two=user)
+            cur_thread = Thread.objects.get(user_one=partner, user_two=user, closed=False)
+
         except Thread.DoesNotExist:
             return redirect('new_thread', username=partner.username)
     # get message, if one, save it to thread
@@ -126,7 +129,7 @@ def retract_or_decline(request, thread_id):
 def accept(request, username):
     partner = User.objects.get(username=username)
     user = request.user
-    thread_accepted = Thread.objects.get(user_one=partner, user_two=user)
+    thread_accepted = Thread.objects.get(user_one=partner, user_two=user, closed=False)
     thread_accepted.accepted = True
     thread_accepted.save()
     messages.success(request, f'Debate on {thread_accepted.topic} with {partner.username} accepted! Get started below')
@@ -149,10 +152,13 @@ def spectate(request, thread_id):
     thread = Thread.objects.get(id=thread_id)
     user = request.user
 
+    if thread.closed:
+        messages.warning(request, 'This debate has concluded')
+
     # FIXME: safety, see if we can get rid off
-    if user == thread.user_one:
+    if user == thread.user_one and not thread.closed:
         return redirect('thread', username=thread.user_two.username)
-    if user == thread.user_two:
+    if user == thread.user_two and not thread.closed:
         return redirect('thread', username=thread.user_one.username)
 
     if request.method == 'POST':
@@ -200,3 +206,11 @@ def debate_feed(request, username):
     user = request.user
     followed_threads = user.profile.threads.all()
     return render(request, 'debatefeed.html', {'threads': followed_threads})
+
+
+@login_required
+def close_thread(request, thread_id):
+    thread = Thread.objects.get(id=thread_id)
+    thread.closed = True
+    thread.save()
+    return redirect('spectate', thread_id=thread_id)

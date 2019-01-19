@@ -13,4 +13,5 @@ urlpatterns = [
     path('follow-debate/?P<thread_id>/', views.follow_thread, name='follow_thread'),
     path('unfollow-debate/?P<thread_id>/', views.unfollow_thread, name='unfollow_thread'),
     path('debate-feed/?P<username>/', views.debate_feed, name='debatefeed'),
+    path('close-debate/?P<thread_id>/', views.close_thread, name='close_thread'),
 ]

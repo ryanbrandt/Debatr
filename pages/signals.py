@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from pages.models import Profile, Post
 from messaging.models import Thread
+from notifications.models import Notification
+from django.contrib import messages
 
 ''' Signals for pages application '''
 

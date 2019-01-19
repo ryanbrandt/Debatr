@@ -4,7 +4,7 @@
 {% block title %} Debate Spectate {% endblock %}
 {% block content %}
 <br/>
-<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1>{% if thread not in user.profile.threads.all %}<a class="btn btn-primary" style="float: right;" href="{% url 'follow_thread' thread_id=thread.id %}">Follow Debate</a>{% else %}<a class="btn btn-danger" style="float: right; color: white;" href="{% url 'unfollow_thread' thread_id=thread.id %}">Unfollow</a> {% endif %}
+<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1>{% if thread not in user.profile.threads.all and thread.user_one != user and thread.user_two != user %}<a class="btn btn-primary" style="float: right;" href="{% url 'follow_thread' thread_id=thread.id %}">Follow Debate</a>{% elif thread.user_one != user and thread.user_two != user %}<a class="btn btn-danger" style="float: right; color: white;" href="{% url 'unfollow_thread' thread_id=thread.id %}">Unfollow</a> {% endif %}
 <div class="bottom-border">
 </div>
 <div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container">
@@ -104,6 +104,7 @@
         });
     };
 </script>
+{% if not thread.closed %}
 <script>
 // seperate ajax script to fetch new messages every 15 seconds, sharing websocket is burdenous
 
@@ -147,4 +148,5 @@ $(document).ready(function() {
 });
 
 </script>
+{% endif %}
 {% endblock %}

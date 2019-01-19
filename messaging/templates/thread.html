@@ -5,7 +5,7 @@
 {% block content %}
 {% if thread.accepted %}
 <br/>
-<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1><button class="btn btn-danger" style="float: right;" title="WARNING: THIS ENDS DEBATE">Close Debate</button>
+<h1 style="display: inline-block;">Debate on {{ thread.topic }}</h1>{% if not thread.closed %}<a class="btn btn-danger" style="float: right;" title="WARNING: THIS ENDS DEBATE" href="{% url 'close_thread' thread_id=thread.id %}">Close Debate</a> {% endif %}
 <div class="bottom-border">
 </div>
 <div class="container" style="height: 70vh; overflow-y: auto; margin-top: 10px; bottom: 0;" id="container">

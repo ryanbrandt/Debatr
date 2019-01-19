@@ -38,4 +38,69 @@
         {% endfor %}
     </ul>
 </div>
+<br/>
+<h3>Closed Debates</h3>
+<div class="bottom-border">
+</div>
+{% if not closed_debates %}
+<small style="font-style: italic;">
+    Theres nothing here...
+</small>
+{% else %}
+<div class="container" style="display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; margin-top: 20px; bottom: 0;">
+    {% for result in closed_debates %}
+        {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <div class="card-body">
+                <strong><h3 class="card-title" style="text-align: center;">{{ result.topic }}</h3></strong>
+                <img src = "{{ result.user_one.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <img src = "{{ result.user_two.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px; float: right;">
+                <br/>
+                <strong style="float: left;">{{ result.user_one.username }}</strong>
+                <strong style="float: right;">{{ result.user_two.username }}</strong>
+                <br/>
+                <br/>
+                <a href="{% url 'spectate' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 38%; margin-bottom: 5px;">View</a>
+           </div>
+         </div>
+        </div>
+     {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+<br/>
+<h3>Live Debates</h3>
+<div class="bottom-border">
+</div>
+{% if not open_debates %}
+<small style="font-style: italic;">
+    Theres nothing here...
+</small>
+{% else %}
+<div class="container" style="display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; margin-top: 20px; bottom: 0;">
+    {% for result in open_debates %}
+        {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <div class="card-body">
+                <strong><h3 class="card-title" style="text-align: center;">{{ result.topic }}</h3></strong>
+                <img src = "{{ result.user_one.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <img src = "{{ result.user_two.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px; float: right;">
+                <br/>
+                <strong style="float: left;">{{ result.user_one.username }}</strong>
+                <strong style="float: right;">{{ result.user_two.username }}</strong>
+                <br/>
+                <br/>
+                <a href="{% url 'spectate' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 38%; margin-bottom: 5px;">View</a>
+           </div>
+         </div>
+        </div>
+     {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}

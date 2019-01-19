@@ -16,6 +16,7 @@ class Thread(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     topic = models.CharField(null=True, max_length=50)
     accepted = models.BooleanField(default=False)
+    closed = models.BooleanField(default=False)
 
     # get function to retrieve thread with users or create thread with users if DNE, for async
     def get_or_new(self, user, other_username):

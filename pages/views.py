@@ -92,10 +92,12 @@ def profile(request, username=None):
     if username != user.username:
         return redirect('other-profile', username)
 
-    user_posts = Post.objects.filter(author=user)
+    user_posts = Post.objects.filter(author=user).order_by('-date_posted')
+    closed_debates = Thread.objects.filter((Q(user_one=user) | Q(user_two=user)) & Q(closed=True))
+    open_debates = Thread.objects.filter((Q(user_one=user) | Q(user_two=user)) & Q(closed=False))
     follower_count = Profile.objects.filter(following=user).count()
     following_count = user.profile.following.count()
-    return render(request, "user_profile.html", {'follower_count': follower_count, 'following_count': following_count, 'user_posts': user_posts})
+    return render(request, "user_profile.html", {'follower_count': follower_count, 'following_count': following_count, 'user_posts': user_posts, 'closed_debates': closed_debates, 'open_debates': open_debates})
 
 
 # user update profile view
@@ -143,12 +145,14 @@ def search(request, username=None):
         user_results = User.objects.filter(Q(username__icontains=query))
         # filter out current user
         user_results = user_results.exclude(username=request.user.username)
-        # get related debates
-        thread_results = Thread.objects.filter(Q(topic__icontains=query))
+        # get related live debates
+        thread_results = Thread.objects.filter(Q(topic__icontains=query) & Q(closed=False))
         # filter any of user's debates and any un-accepted debates
         thread_results = thread_results.exclude(Q(user_one=request.user) | Q(user_two=request.user))
         thread_results = thread_results.exclude(Q(accepted=False))
-    return render(request, "search.html", {'results': user_results, 'query': query, 'thread_results': thread_results})
+        # get relevant closed debates, let users search their own closed debates
+        closed_results = Thread.objects.filter(Q(topic__icontains=query) & Q(closed=True))
+    return render(request, "search.html", {'results': user_results, 'query': query, 'thread_results': thread_results, 'closed_results': closed_results})
 
 
 # other profile view (e.g. view for profiles that aren't current users)
@@ -169,6 +173,8 @@ def other_profile(request, username):
                 cur_user.profile.following.remove(user_visiting)
                 messages.success(request, f'{user_visiting.username} successfully unfollowed!')
 
-        user_posts = Post.objects.filter(author=user_visiting)
-        return render(request, "other_profile.html", {'user_visiting': user_visiting, 'user_posts': user_posts})
+        closed_debates = Thread.objects.filter((Q(user_one=user_visiting) | Q(user_two=user_visiting)) & Q(closed=True)).order_by('-timestamp')
+        open_debates = Thread.objects.filter((Q(user_one=user_visiting) | Q(user_two=user_visiting)) & Q(closed=False)).order_by('-timestamp')
+        user_posts = Post.objects.filter(author=user_visiting).order_by('-date_posted')
+        return render(request, "other_profile.html", {'user_visiting': user_visiting, 'user_posts': user_posts, 'open_debates': open_debates, 'closed_debates': closed_debates})
 

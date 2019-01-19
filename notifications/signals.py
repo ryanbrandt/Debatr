@@ -91,3 +91,4 @@ def make_decline_notification(sender, instance, using, **kwargs):
     orig_not = Notification.objects.get(user=user_declining, notification='New debate request from ' f'{user_declined.username}')
     orig_not.read = True
     orig_not.save()
+

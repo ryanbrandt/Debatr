@@ -31,7 +31,7 @@
         {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
         {% if forloop.last %} </div> {% endif %}
     {% endfor %}
-    <h3 style="margin-top: 20px;">Debate Results for Search "{{ query }}"</h3>
+    <h3 style="margin-top: 20px;">Live Debate Results for Search "{{ query }}"</h3>
     <div class = "bottom-border" style="margin-bottom: 20px;">
     </div>
     {% if not thread_results %}
@@ -56,6 +56,33 @@
                 {% else %}
                     <a href="{% url 'unfollow_thread' thread_id=result.id %}" class="btn btn-danger" style="margin-left: 32%;">Unfollow</a>
                 {% endif %}
+           </div>
+         </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 %} </div> <div class = "row"> {% endif %}
+        {% if forloop.last %} </div> {% endif %}
+    {% endfor %}
+    <br/>
+        <h3 style="margin-top: 20px;">Closed Debate Results for Search "{{ query }}"</h3>
+    <div class = "bottom-border" style="margin-bottom: 20px;">
+    </div>
+    {% if not closed_results %}
+    <small style="font-style: italic;">There's nothing here...</small>
+    {% endif %}
+    {% for result in closed_results %}
+        {% if forloop.first %} <div class = "row"> {% endif %}
+        <div class = "col-xs-4">
+         <div class="card" style="width: 18rem; background-color: #ced0b7a1 !important; margin-right: 15px; margin-left: 15px; margin-bottom: 15px;">
+            <div class="card-body">
+                <strong><h3 class="card-title" style="text-align: center;">{{ result.topic }}</h3></strong>
+                <img src = "{{ result.user_one.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;">
+                <img src = "{{ result.user_two.profile.image.url }}" class = "rounded-circle" style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px; float: right;">
+                <br/>
+                <strong style="float: left;">{{ result.user_one.username }}</strong>
+                <strong style="float: right;">{{ result.user_two.username }}</strong>
+                <br/>
+                <br/>
+                <a href="{% url 'spectate' thread_id=result.id %}" class="btn btn-primary" style="margin-left: 38%; margin-bottom: 5px;">View</a>
            </div>
          </div>
         </div>
