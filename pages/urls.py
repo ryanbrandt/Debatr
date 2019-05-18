@@ -17,4 +17,5 @@ urlpatterns = [
     path('for-your-consideration/', views.consideration, name = 'consideration'),
     path('user-profile/?P<username>/', views.other_profile, name = 'other-profile'),
     path('getting-started/', views.getting_started, name='getting-started'),
+    path('notifications-ajax/', views.get_notifications, name='notification-ajax'),
 ]

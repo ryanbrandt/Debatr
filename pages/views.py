@@ -5,11 +5,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from pages.models import User, Profile, Post
+from notifications.models import Notification
 from messaging.models import Thread
 from datetime import datetime
 from datetime import timedelta
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 
 ''' Views for simple webpages application '''
@@ -178,3 +179,12 @@ def other_profile(request, username):
         user_posts = Post.objects.filter(author=user_visiting).order_by('-date_posted')
         return render(request, "other_profile.html", {'user_visiting': user_visiting, 'user_posts': user_posts, 'open_debates': open_debates, 'closed_debates': closed_debates})
 
+
+# helper to populate notifications in navbar via AJAX
+def get_notifications(request):
+    user = request.user;
+    # do query, get unread notifications count
+    notifications = Notification.objects.filter(Q(user_id=user.id, read=0))
+    num_notifications = len(notifications)
+    print(num_notifications)
+    return JsonResponse({'count': num_notifications})
