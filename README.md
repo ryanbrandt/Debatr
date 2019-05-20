@@ -1,5 +1,5 @@
 # Debatr #
-Debatr is a full stack project I am currently working on to gain some experience with a handful of libraries I have wanted to work with for a while! I am anticipating its completion and deployment towards the end of January.
+Debatr is a full stack project I am currently working on to gain some experience with a handful of libraries I have wanted to work with for a while! I'm hoping to deploy early this summer.
 
 ## What is Debatr? ##
 Debatr is an innovative new take on the idea of a social network--a social network where individuals converge to engage in discourse over the most pressing issues of our times. From politics to economics, philosophy, and more, the goal of Debatr is to encourage critical thinking through rational and respectful dialectic.
@@ -14,7 +14,7 @@ Debatr is an innovative new take on the idea of a social network--a social netwo
 2. A Video "Debate" System
 3. A Simple REST API For Mobile Deployment
 
-## Key Tech Stack ##
+## Implementation ##
 
 ### Languages ###
 1. Python
