@@ -56,7 +56,7 @@
           {% if user.is_authenticated %}
           <div class = "dropdown-divider"></div>
           <a class="dropdown-item" href="#">Help</a>
-          <a class = "dropdown-item" href = "{% url 'logout' %}">Log Out</a>
+          <a class = "dropdown-item logout" href = "{% url 'logout' %}">Log Out</a>
           {% endif %}
         </div>
       </li>
@@ -86,7 +86,6 @@
         {% block content %}
         {% endblock%}
   </main>
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
@@ -109,12 +108,18 @@
 
           success: function(count) {
             if(count['count'] > 0){
-                console.log(count);
+                console.log(count + ' new notifications successfully fetched');
                 document.getElementById("notifCount").innerHTML = " " + count['count'] + " ";
             }
           }
         })
       }
+      /* logout validation */
+      $('.logout').on('submit click', function() {
+        if(!confirm("Are you sure?")){
+          return false;
+        }
+      })
     </script>
   </body>
 </html>

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from messaging.models import Thread
 from PIL import Image
 
-''' Models for General Webpages '''
+''' Models for 'General' Webpages '''
 
 # TODO: add 'followed debates' to profiles
 
@@ -21,11 +21,11 @@ class Post(models.Model):
     # if user deleted, so are posts
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_choices = (
-        ('','--'),
-        ('LFD', 'Looking for a debate'),
-        ('FYC', 'For your consideration'),
-        ('SI', 'Seeking information'),
-        ('ND', 'New Debate'),
+        ('', '--'),
+        ('Looking for a debate', 'Looking for a debate'),
+        ('For your consideration', 'For your consideration'),
+        ('Seeking information', 'Seeking information'),
+        ('New Debate', 'New Debate'),
     )
     post_type = models.CharField(max_length=1, choices=post_choices)
     post_image = models.ImageField(default=None, null=True)
@@ -55,8 +55,16 @@ class Profile(models.Model):
         img = Image.open(self.image.path)
         # if greater than 300x300, resize and save
         if img.width > 300 or img.height > 300:
-            output_size = (300,300)
+            output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
 
 
+# a 'child' comment of a post, recursively defined for threading and hopefully tree building in linear time
+class ChildPost(models.Model):
+    content = models.TextField()
+    date_posted = models.DateTimeField(default=timezone.now())
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    # bad way to do this
+    parentPost = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    parentChild = models.ForeignKey('self', on_delete=models.CASCADE, null=True)

@@ -3,10 +3,6 @@
 {% load crispy_forms_tags %}
 {% block title %} Welcome to Debatr! {% endblock %}
 {% block content %}
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href ="{% static 'css/style.css' %}">
-    <body>
         <div class = "login-box">
             <h3> Welcome to Debatr! </h3>
             <div class = "bottom-border">
@@ -25,8 +21,8 @@
             <small><a href = "{% url 'getting-started' %}">New to Debatr? Here's how to get started</a></small>
             <br/>
             <br/>
-            <form action = "{% url 'logout' %}">
-                <button class = "btn btn-primary" type = "submit">Log Out</button>
+            <form action = "{% url 'logout' %}" class="logout">
+                <button class = "btn btn-primary" type = "submit" >Log Out</button>
             </form>
             {% endif %}
         </div>
@@ -50,8 +46,9 @@
                         <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
                     {% endif %}
                     <br/>
-                    <p>{{ post.content }} {% if post.post_type == 'ND' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
-                    <small>{{ post.date_posted }}</small>
+                    <p>{{ post.content }} {% if post.post_type == 'New debate' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
+                    <small>{{ post.date_posted }}</small><br/>
+                    <small><a id="{{ post.id }}" class="get-comments" href="#"><strong>View Comments</strong></a> </small>
                 </div>
                 {% else %}
                 <div class="alert alert-primary">
@@ -61,19 +58,34 @@
                         <small style="float: right; font-style: italic;">{{ post.get_post_type_display }}</small>
                     {% endif %}
                     <br/>
-                    <p>{{ post.content }} {% if post.post_type == 'ND' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
-                    <small>{{ post.date_posted }}</small>
+                    <p>{{ post.content }} {% if post.post_type == 'New debate' %}<a href="{% url 'spectate' thread_id=post.post_thread.id %}" style="text-decoration: none; color: blue;">Spectate Now</a>{% endif %}</p>
+                    <small>{{ post.date_posted }}</small><br/>
+                    <small><a id="{{ post.id }}" class="get-comments" href="#"><strong>View Comments</strong></a> </small>
                 </div>
                 {% endif %}
             {% endfor %}
             </ul>
         </div>
+        <!-- Modal to be dynamically populated with comment thread --->
+        <div class="modal" tabindex="-1" role="dialog" id="commentModal" style="">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Bid History for <%=auctionData.get("name")%></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- stuff goes here, a loader at first --->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
-    </body>
-</head>
-
-</html>
-
 {% if user.is_authenticated %}
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
@@ -109,7 +121,6 @@
                  //reset timer, execute query to fetch recent posts including one just posted
                    clearTimeout(myTimer);
                    executeQuery();
-
                 }
                 form[0].reset();
                 console.log("success");
@@ -163,6 +174,30 @@
       clearTimeout(myTimer);
       myTimer = setTimeout(executeQuery, 15000);
     });
+
+    /* dynamically build modal based on post clicked */
+    $('.get-comments').on('click', function(){
+        $.ajax({
+            url: '{% url 'comments-ajax' %}',
+            method: 'POST',
+            data: {'id': $(this).attr('id')},
+
+            success: function(data){
+                if(data){
+                    // data is a jsonified django queryset, iterate to populate modal
+                    for(var key in data){
+                        // populate modal here!
+                        console.log(key, data[key]);
+                    }
+                } else {
+                        // say sorry nothing here!
+                }
+
+            }
+
+        })
+
+    })
 
 </script>
 {% endif %}

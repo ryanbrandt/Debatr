@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, authenticate
 from pages.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +12,11 @@ from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 import json
 
-''' Views for simple webpages application '''
+''' Views for simple webpages application
+ 
+    FIXME: this can really be split into several smaller applications.. FML
+ 
+ '''
 
 
 # homepage view
@@ -51,6 +54,14 @@ def home(request):
         return HttpResponse(new_posts, content_type='application/json')
 
     return render(request, "home.html", {'form': form, 'recent_feed': recent_feed})
+
+
+# utility to respond to ajax calls for 'view comments' in post feed; fetches comment threads
+def get_comments(request):
+
+    # do query and jsonify here
+
+    return
 
 
 @login_required

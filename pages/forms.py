@@ -60,7 +60,7 @@ class ProfileUpdateForm(forms.ModelForm):
                 # see if tag object already exists, no duplicates, else make new tag, add to user
                 cur_tag = None
                 try:
-                    cur_tag = Tag.objects.get(tag__iexact = interest)
+                    cur_tag = Tag.objects.get(tag__iexact=interest)
                 except Tag.DoesNotExist:
                     pass
                 if cur_tag:
@@ -72,7 +72,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
 # simple post creation form for user 'feed' posts
 class PostCreationForm(forms.Form):
-    post = forms.CharField(required=True)
+    post = forms.CharField(widget=forms.Textarea(attrs={'cols': 15, 'rows': 8}), required=True)
     post_type = forms.ChoiceField(required=False, choices=Post.post_choices)
     post_image = forms.ImageField(required=False)
 
