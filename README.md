@@ -5,7 +5,7 @@ Debatr is a full stack project I am currently working on to gain some experience
 Debatr is an innovative new take on the idea of a social network--a social network where individuals converge to engage in discourse over the most pressing issues of our times. From politics to economics, philosophy, and more, the goal of Debatr is to encourage critical thinking through rational and respectful dialectic.
 
 ## Some Key Features (Already Implemented) ##
-1. Social Network Fundamentals (e.g. user profile, friends, newsfeeds, etc.)
+1. Social Network Fundamentals (e.g. user profile, friends, newsfeeds, threaded commenting etc.)
 2. Asynchronous "Debating" (Messaging) & Notifications
 3. A "Debate" Match System Implemented with a Natural Language Processing Model Which Continuously Learns via Users
 
