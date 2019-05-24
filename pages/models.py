@@ -63,8 +63,7 @@ class Profile(models.Model):
 # a 'child' comment of a post, recursively defined for threading and hopefully tree building in linear time
 class ChildPost(models.Model):
     content = models.TextField()
-    date_posted = models.DateTimeField(default=timezone.now())
+    date_posted = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    # bad way to do this
-    parentPost = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    parentPost = models.ForeignKey(Post, on_delete=models.CASCADE)
     parentChild = models.ForeignKey('self', on_delete=models.CASCADE, null=True)

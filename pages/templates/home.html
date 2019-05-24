@@ -30,7 +30,7 @@
         <br/>
         {% if user.is_authenticated %}
         <img src = {{ user.profile.image.url }} style="background-size: cover; border-radius: 50% 50% 50% 50%; width: 85px; height: 90px;" class="rounded-circle">
-        <form method="post" class="post-form">
+        <form method="post" id="postForm">
             {% csrf_token %}
             {{ form | crispy }}
             <button class="btn btn-primary" type="submit">Share</button>
@@ -71,13 +71,25 @@
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Bid History for <%=auctionData.get("name")%></h5>
+                        <h5 class="modal-title">Comments</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- stuff goes here, a loader at first --->
+                        <!-- Loader visible while fetching; replaced by content on success --->
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border text-primary" role="status" id="loader">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="modalContent"></div>
+                        <!-- Comment Field -->
+                        <form method="POST" id="commentForm">
+                            {% csrf_token %}
+                            {{ comment_form | crispy }}
+                            <button class="btn btn-primary" type="submit">Submit</button>
+                        </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -95,7 +107,7 @@
      var myTimer;
     // ajax script to update posts on submit
 
-    $(document).on('submit', '.post-form', function(event){
+    $('#postForm').on('submit', function(event){
     // takes class acknowledge-form, need to get instance to get id which contains notification
         event.preventDefault();
         var form = $(this);
@@ -177,26 +189,57 @@
 
     /* dynamically build modal based on post clicked */
     $('.get-comments').on('click', function(){
+        document.getElementById('modalContent').innerHTML = "";
+        $('#commentModal').modal('show');
         $.ajax({
             url: '{% url 'comments-ajax' %}',
             method: 'POST',
-            data: {'id': $(this).attr('id')},
+            data: {'id': $(this).attr('id'), 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
 
             success: function(data){
-                if(data){
-                    // data is a jsonified django queryset, iterate to populate modal
+                console.log('successful comment fetch');
+                document.getElementById('loader').style.display = 'none';
+                // if non-empty json response, populate modal with data
+                if(Object.entries(data).length > 0){
                     for(var key in data){
-                        // populate modal here!
+                        var timestamp = data[key]['fields']['date_posted'];
+                        var formattedTime = moment(timestamp).format('MMM Do YYYY, h:mm a');
                         console.log(key, data[key]);
+                        if(data[key]['fields']['author'] != {{ user.id }}){
+                            $('#modalContent').append('<div class="alert alert-secondary" style="width: 100%;">' +
+                            '<p>' + data[key]['fields']['content'] + '</p>' +
+                            '<small>' + formattedTime + '</small>' + '</div>');
+                        } else {
+                            $('#modalContent').append('<div class="alert alert-primary">' +
+                            '<p>' + data[key]['fields']['content'] + '</p>' +
+                            '<small>' + formattedTime + '</small>' + '</div>');
+                        }
                     }
+                // empty json response, no comments yet
                 } else {
-                        // say sorry nothing here!
+                        $('#modalContent').prepend('<small>No Comments Yet</small>');
                 }
 
             }
 
         })
 
+    })
+
+    /* ajax to submit new comments */
+    $('#commentForm').on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+            url: '{% url 'post-comment-ajax' %}',
+            method: 'POST',
+            data: {'commentData': $(this).serializeArray(), 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
+
+            success: function(){
+                console.log('comment created');
+                // do stuff
+
+            }
+        })
     })
 
 </script>

@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from pages.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostCreationForm
+from pages.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostCreationForm, ChildPostCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from pages.models import User, Profile, Post
+from pages.models import User, Profile, Post, ChildPost
 from notifications.models import Notification
 from messaging.models import Thread
 from datetime import datetime
@@ -24,10 +24,12 @@ import json
 def home(request):
     form = None
     recent_feed = None
+    comment_form = None
 
     if request.user.is_authenticated:
         user = request.user
         form = PostCreationForm()
+        comment_form = ChildPostCreationForm()
         recent_feed = Post.objects.filter(Q(author__in=user.profile.following.all()) | Q(author=user)).order_by('-date_posted')[:30]
 
     if request.method == 'POST':
@@ -53,14 +55,23 @@ def home(request):
         new_posts = json.dumps(new_posts)
         return HttpResponse(new_posts, content_type='application/json')
 
-    return render(request, "home.html", {'form': form, 'recent_feed': recent_feed})
+    return render(request, "home.html", {'form': form, 'recent_feed': recent_feed, 'comment_form': comment_form})
 
 
-# utility to respond to ajax calls for 'view comments' in post feed; fetches comment threads
+# utility to unload comments for a post on 'view comments' ajax call
 def get_comments(request):
+    post_id = request.POST.get('id')
+    # grab all comments of the post item
+    all_comments = ChildPost.objects.filter((Q(parentPost=post_id))).order_by('-date_posted')
+    # jsonify and return, js handles threading logic
+    comments_json = serializers.serialize('json', all_comments)
+    print(comments_json)
+    return HttpResponse(comments_json, content_type='application/json')
 
-    # do query and jsonify here
 
+# utility to post new comments via submitting the comment form in 'view comments'
+def post_comment(user, parent, request):
+    # TODO: handle new comment creation and saving here
     return
 
 

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from pages.models import Profile, Tag, Post
+from pages.models import Profile, Tag, Post, ChildPost
 import re
 
 ''' Forms for pages application '''
@@ -91,3 +91,17 @@ class PostCreationForm(forms.Form):
     def save(self, user, post_type):
         data = self.cleaned_data
         Post.objects.create(content=data['post'], author=user, post_type=post_type)
+
+
+# simple post comment creation form accessible from 'view comments' modal in feed
+class ChildPostCreationForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea(attrs={'cols': 10, 'rows': 6}), required=True)
+
+    class Meta:
+        model = ChildPost
+        fields = ['comment']
+
+    def __init__(self, *args, **kwargs):
+        super(ChildPostCreationForm, self).__init__(*args, **kwargs)
+        self.fields['comment'].label = 'Comment'
+        self.fields['comment'].help_text = 'Comment on this Post'
