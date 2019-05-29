@@ -85,10 +85,10 @@
                         </div>
                         <div id="modalContent"></div>
                         <!-- Comment Field -->
-                        <form method="POST" id="commentForm">
+                        <form method="post" id="commentForm">
                             {% csrf_token %}
                             {{ comment_form | crispy }}
-                            <button class="btn btn-primary" type="submit">Submit</button>
+                            <button class="btn btn-primary" type="submit" id="commentSubmit">Submit</button>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -190,6 +190,7 @@
     /* dynamically build modal based on post clicked */
     $('.get-comments').on('click', function(){
         document.getElementById('modalContent').innerHTML = "";
+        $('#commentSubmit').val($(this).attr('id'));
         $('#commentModal').modal('show');
         $.ajax({
             url: '{% url 'comments-ajax' %}',
@@ -225,14 +226,13 @@
         })
 
     })
-
     /* ajax to submit new comments */
     $('#commentForm').on('submit', function(e){
         e.preventDefault();
         $.ajax({
             url: '{% url 'post-comment-ajax' %}',
             method: 'POST',
-            data: {'commentData': $(this).serializeArray(), 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
+            data: {'comment': $(this).serializeArray()[1]["value"], 'post_id': $('#commentSubmit').val(), 'csrfmiddlewaretoken':$('[name=csrfmiddlewaretoken]').val()},
 
             success: function(){
                 console.log('comment created');
@@ -241,7 +241,6 @@
             }
         })
     })
-
 </script>
 {% endif %}
 

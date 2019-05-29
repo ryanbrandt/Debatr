@@ -70,9 +70,15 @@ def get_comments(request):
 
 
 # utility to post new comments via submitting the comment form in 'view comments'
-def post_comment(user, parent, request):
-    # TODO: handle new comment creation and saving here
-    return
+def post_comment(request):
+    form = ChildPostCreationForm(request.POST)
+
+    if form.is_valid():
+        form.save()
+    else:
+        print(form.errors)
+
+    return HttpResponse("")
 
 
 @login_required
